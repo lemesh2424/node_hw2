@@ -1,7 +1,7 @@
 import express from 'express';
 import config from './config';
 import loaders from './loaders';
-
+import 'reflect-metadata';
 
 async function startServer() {
     const app = express();

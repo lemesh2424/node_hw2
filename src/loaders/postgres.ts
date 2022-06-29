@@ -1,19 +1,8 @@
-import { Sequelize } from 'sequelize';
-import config from '../config';
+import { AppDataSource } from '../data-source';
 
-export default async (): Promise<void> => {
-    const sequelize = new Sequelize(config.databaseName, config.databaseUser, config.databasePassword, {
-        host: config.databaseHost,
-        dialect: 'postgres',
-        pool: {
-            max: 5,
-            min: 0,
-            idle: 10000
-        }
-    });
-
+export default async () => {
     try {
-        await sequelize.authenticate();
+        await AppDataSource.initialize();
         console.log('Connection has been established successfully.');
     } catch (error) {
         console.error('Unable to connect to the database:', error);

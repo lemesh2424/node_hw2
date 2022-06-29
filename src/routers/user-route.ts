@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import User, { UserInput } from '../models/User';
+import User from '../models/User';
 import * as Joi from 'joi';
 import {
     ContainerTypes,
@@ -40,7 +40,7 @@ userRouter.get('/', async (req: Request, res: Response) => {
             res.status(200).json({ users });
         }
     } catch (error) {
-        console.error(error);
+        res.status(500).json({ message: error });
     }
 });
 
@@ -58,7 +58,7 @@ userRouter.get('/:id', async (req: Request, res: Response) => {
             res.status(200).json(user);
         }
     } catch (error) {
-        console.error(error);
+        res.status(500).json({ message: error });
     }
 });
 
@@ -66,14 +66,14 @@ userRouter.post(
     '/',
     validator.body(userSchema),
     async (req: ValidatedRequest<UserRequestSchema>, res: Response) => {
-        const userDTO = req.body as UserInput;
+        const userDTO = req.body as User;
 
         try {
             const user = await userService.createUser(userDTO);
 
             res.status(200).json(user);
         } catch (error) {
-            console.error(error);
+            res.status(500).json({ message: error });
         }
     }
 );
@@ -92,7 +92,7 @@ userRouter.put(
                     message: `User with id ${userId} not found`
                 });
             } else {
-                const newUser = req.body as UserInput;
+                const newUser = req.body as User;
                 await userService.updateById(userId, newUser);
 
                 const updatedUser = await userService.getById(userId);
@@ -100,7 +100,7 @@ userRouter.put(
                 res.status(200).json({ message: 'User successfully updated', user: updatedUser });
             }
         } catch (error) {
-            console.error(error);
+            res.status(500).json({ message: error });
         }
     }
 );
@@ -108,16 +108,20 @@ userRouter.put(
 userRouter.delete('/:id', async (req: Request, res: Response) => {
     const userId = req.params.id;
 
-    const user = await userService.getById(userId);
+    try {
+        const user = await userService.getById(userId);
 
-    if (!user) {
-        res.status(404).json({
-            message: `User with id ${userId} not found`
-        });
-    } else {
-        await userService.deleteById(userId);
+        if (!user) {
+            res.status(404).json({
+                message: `User with id ${userId} not found`
+            });
+        } else {
+            await userService.deleteById(userId);
 
-        res.status(200).json({ message: 'User successfully deleted', user });
+            res.status(200).json({ message: 'User successfully deleted', user });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error });
     }
 });
 

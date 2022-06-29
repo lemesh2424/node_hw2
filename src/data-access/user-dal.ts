@@ -1,41 +1,46 @@
-import User, { UserInput } from '../models/User';
+import User from '../models/User';
+import { AppDataSource } from '../data-source';
+import { Repository } from 'typeorm';
 
 export default class UserDAL {
+    private userRepository: Repository<User>;
+
+    constructor() {
+        this.userRepository = AppDataSource.getRepository(User);
+    }
+
     async findAll(): Promise<User[]> {
-        return await User.findAll();
-    }
-
-    async getById(userId: string): Promise<User> {
-        return await User.findByPk(userId);
-    }
-
-    async createUser(user: UserInput): Promise<User> {
-        return await User.create(user);
-    }
-
-    async updateById(userId: string, newUser: UserInput): Promise<[affectedCount: number]> {
-        return await User.update({ ...newUser }, {
+        return await this.userRepository.find({
             where: {
-                id: userId
+                isDeleted: false
             }
         });
     }
 
-    async deleteById(userId: string): Promise<number> {
-        try {
-            await User.update({ isDeleted: true }, {
-                where: {
-                    id: userId
-                }
-            });
+    async getById(userId: string): Promise<User> {
+        return await this.userRepository.findOneBy({
+            id: userId,
+            isDeleted: false
+        });
+    }
 
-            return await User.destroy({
-                where: {
-                    id: userId
-                }
-            });
-        } catch (error) {
-            console.error(error);
-        }
+    async createUser(user: User): Promise<User> {
+        return await this.userRepository.save(user);
+    }
+
+    async updateById(userId: string, newUser: User): Promise<User> {
+        const userToUpdate = await this.getById(userId);
+
+        Object.assign(userToUpdate, newUser);
+
+        return await this.userRepository.save(userToUpdate);
+    }
+
+    async deleteById(userId: string): Promise<User> {
+        const userToDelete = await this.getById(userId);
+
+        userToDelete.isDeleted = true;
+
+        return await this.userRepository.softRemove(userToDelete);
     }
 }

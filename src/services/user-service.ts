@@ -1,4 +1,4 @@
-import User, { UserInput } from '../models/User';
+import User from '../models/User';
 import UserDAL from '../data-access/user-dal';
 
 export default class UserService {
@@ -16,15 +16,15 @@ export default class UserService {
         return await this.userDal.getById(userId);
     }
 
-    async createUser(user: UserInput): Promise<User> {
+    async createUser(user: User): Promise<User> {
         return await this.userDal.createUser(user);
     }
 
-    async updateById(userId: string, newUser: UserInput): Promise<[affectedCount: number]> {
+    async updateById(userId: string, newUser: User): Promise<User> {
         return await this.userDal.updateById(userId, newUser);
     }
 
-    async deleteById(userId: string): Promise<number> {
+    async deleteById(userId: string): Promise<User> {
         return await this.userDal.deleteById(userId);
     }
 }
