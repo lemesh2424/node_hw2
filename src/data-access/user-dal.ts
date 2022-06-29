@@ -10,17 +10,12 @@ export default class UserDAL {
     }
 
     async findAll(): Promise<User[]> {
-        return await this.userRepository.find({
-            where: {
-                isDeleted: false
-            }
-        });
+        return await this.userRepository.find();
     }
 
     async getById(userId: string): Promise<User> {
         return await this.userRepository.findOneBy({
-            id: userId,
-            isDeleted: false
+            id: userId
         });
     }
 
@@ -41,6 +36,7 @@ export default class UserDAL {
 
         userToDelete.isDeleted = true;
 
-        return await this.userRepository.softRemove(userToDelete);
+        const deletedUser = await this.userRepository.save(userToDelete);
+        return await this.userRepository.softRemove(deletedUser);
     }
 }
