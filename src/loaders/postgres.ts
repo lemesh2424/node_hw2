@@ -1,10 +1,11 @@
-import { AppDataSource } from '../data-source';
+import { logger } from '../utils/logger';
+import { AppDataSource } from '../utils/data-source';
 
 export default async () => {
     try {
         await AppDataSource.initialize();
-        console.log('Connection has been established successfully.');
+        logger.info('Connection has been established successfully.');
     } catch (error) {
-        console.error('Unable to connect to the database:', error);
+        logger.error('Unable to connect to the database:', error);
     }
 };

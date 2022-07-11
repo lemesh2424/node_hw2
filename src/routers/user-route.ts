@@ -8,6 +8,7 @@ import {
     createValidator
 } from 'express-joi-validation';
 import UserService from '../services/user-service';
+import { logger } from '../utils/logger';
 
 const userRouter = express.Router();
 const validator = createValidator();
@@ -32,15 +33,15 @@ userRouter.get('/', async (req: Request, res: Response) => {
     try {
         const { limit, loginSubstring } = req.query;
 
-        const users = await userService.getAllUsers();
-
         if (limit || loginSubstring) {
-            res.status(200).json(getAutoSuggestUsers(loginSubstring as string, limit as string, users));
+            res.status(200).json(await userService.getAutoSuggestUsers(loginSubstring as string, limit as string));
         } else {
+            const users = await userService.getAllUsers();
             res.status(200).json({ users });
         }
     } catch (error) {
         res.status(500).json({ message: error });
+        logger.error(`${req.method} - ${req.url} - Error: ${error}`);
     }
 });
 
@@ -59,6 +60,7 @@ userRouter.get('/:id', async (req: Request, res: Response) => {
         }
     } catch (error) {
         res.status(500).json({ message: error });
+        logger.error(`${req.method} - ${req.url} - Error: ${error}`);
     }
 });
 
@@ -74,6 +76,7 @@ userRouter.post(
             res.status(200).json(user);
         } catch (error) {
             res.status(500).json({ message: error });
+            logger.error(`${req.method} - ${req.url} - ${JSON.stringify(req.body)} - Error: ${error}`);
         }
     }
 );
@@ -101,6 +104,7 @@ userRouter.put(
             }
         } catch (error) {
             res.status(500).json({ message: error });
+            logger.error(`${req.method} - ${req.url} - ${JSON.stringify(req.body)} - Error: ${error}`);
         }
     }
 );
@@ -122,31 +126,8 @@ userRouter.delete('/:id', async (req: Request, res: Response) => {
         }
     } catch (error) {
         res.status(500).json({ message: error });
+        logger.error(`${req.method} - ${req.url} - Error: ${error}`);
     }
 });
-
-const getAutoSuggestUsers = (loginSubstring = '', limit: string, users: User[]): User[] => {
-    const sortedUsers = users
-        .filter((user: User) => {
-            if (!loginSubstring) {
-                return true;
-            }
-
-            return new RegExp(loginSubstring, 'gm').test(user.login);
-        })
-        .sort((firstUser: User, secondUser: User) => {
-            if (firstUser.login.toLowerCase() > secondUser.login.toLowerCase()) {
-                return 1;
-            } else if (firstUser.login.toLowerCase() < secondUser.login.toLowerCase()) {
-                return -1;
-            }
-
-            return 0;
-        });
-
-    return limit
-        ? sortedUsers.slice(0, +limit)
-        : sortedUsers;
-};
 
 export default userRouter;

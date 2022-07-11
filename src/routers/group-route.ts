@@ -8,6 +8,7 @@ import {
     createValidator
 } from 'express-joi-validation';
 import GroupService from '../services/group-service';
+import { logger } from '../utils/logger';
 
 const groupRouter = express.Router();
 const validator = createValidator();
@@ -33,6 +34,7 @@ groupRouter.get('/', async (req: Request, res: Response) => {
         res.status(200).json({ groups });
     } catch (error) {
         res.status(500).json({ message: error });
+        logger.error(`${req.method} - ${req.url} - Error: ${error}`);
     }
 });
 
@@ -51,6 +53,7 @@ groupRouter.get('/:id', async (req: Request, res: Response) => {
         }
     } catch (error) {
         res.status(500).json({ message: error });
+        logger.error(`${req.method} - ${req.url} - Error: ${error}`);
     }
 });
 
@@ -66,6 +69,7 @@ groupRouter.post(
             res.status(200).json(group);
         } catch (error) {
             res.status(500).json({ message: error });
+            logger.error(`${req.method} - ${req.url} - ${JSON.stringify(req.body)} - Error: ${error}`);
         }
     }
 );
@@ -93,6 +97,7 @@ groupRouter.put(
             }
         } catch (error) {
             res.status(500).json({ message: error });
+            logger.error(`${req.method} - ${req.url} - ${JSON.stringify(req.body)} - Error: ${error}`);
         }
     }
 );
@@ -114,6 +119,7 @@ groupRouter.delete('/:id', async (req: Request, res: Response) => {
         }
     } catch (error) {
         res.status(500).json({ message: error });
+        logger.error(`${req.method} - ${req.url} - Error: ${error}`);
     }
 });
 
@@ -137,6 +143,7 @@ groupRouter.post('/:id/add-users', async (req: Request, res: Response) => {
         }
     } catch (error) {
         res.status(500).json({ message: error });
+        logger.error(`${req.method} - ${req.url} - Error: ${error}`);
     }
 });
 

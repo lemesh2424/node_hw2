@@ -27,4 +27,8 @@ export default class UserService {
     async deleteById(userId: string): Promise<User> {
         return await this.userDal.deleteById(userId);
     }
+
+    async getAutoSuggestUsers(loginSubstring = '', limit: string): Promise<User[]> {
+        return await this.userDal.getAutoSuggestUsers(loginSubstring, limit);
+    }
 }
