@@ -16,6 +16,10 @@ export default class UserService {
         return await this.userDal.getById(userId);
     }
 
+    async getByLogin(login: string): Promise<User> {
+        return await this.userDal.getByLogin(login);
+    }
+
     async createUser(user: User): Promise<User> {
         return await this.userDal.createUser(user);
     }

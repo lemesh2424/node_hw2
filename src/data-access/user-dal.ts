@@ -22,6 +22,13 @@ export default class UserDAL {
         });
     }
 
+    async getByLogin(login: string): Promise<User> {
+        logger.info(`UserDAL - getByLogin(login = ${login})`);
+        return await this.userRepository.findOneBy({
+            login
+        });
+    }
+
     async createUser(user: User): Promise<User> {
         logger.info(`UserDAL - createUser(user = ${JSON.stringify(user)})`);
         return await this.userRepository.save(user);

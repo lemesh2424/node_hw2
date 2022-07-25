@@ -31,10 +31,10 @@ groupRouter.get('/', async (req: Request, res: Response) => {
     try {
         const groups = await groupService.getAllGroups();
 
-        res.status(200).json({ groups });
+        return res.status(200).json({ groups });
     } catch (error) {
-        res.status(500).json({ message: error });
         logger.error(`${req.method} - ${req.url} - Error: ${error}`);
+        return res.status(500).json({ message: error });
     }
 });
 
@@ -45,15 +45,15 @@ groupRouter.get('/:id', async (req: Request, res: Response) => {
         const group = await groupService.getById(groupId);
 
         if (!group) {
-            res.status(404).json({
+            return res.status(404).json({
                 message: `Group with id ${groupId} not found`
             });
-        } else {
-            res.status(200).json(group);
         }
+
+        return res.status(200).json(group);
     } catch (error) {
-        res.status(500).json({ message: error });
         logger.error(`${req.method} - ${req.url} - Error: ${error}`);
+        return res.status(500).json({ message: error });
     }
 });
 
@@ -66,10 +66,10 @@ groupRouter.post(
         try {
             const group = await groupService.createGroup(groupDTO);
 
-            res.status(200).json(group);
+            return res.status(200).json(group);
         } catch (error) {
-            res.status(500).json({ message: error });
             logger.error(`${req.method} - ${req.url} - ${JSON.stringify(req.body)} - Error: ${error}`);
+            return res.status(500).json({ message: error });
         }
     }
 );
@@ -84,20 +84,20 @@ groupRouter.put(
             const group = await groupService.getById(groupId);
 
             if (!group) {
-                res.status(404).json({
+                return res.status(404).json({
                     message: `Group with id ${groupId} not found`
                 });
-            } else {
-                const newGroup = req.body as Group;
-                await groupService.updateById(groupId, newGroup);
-
-                const updatedGroup = await groupService.getById(groupId);
-
-                res.status(200).json({ message: 'Group successfully updated', group: updatedGroup });
             }
+
+            const newGroup = req.body as Group;
+            await groupService.updateById(groupId, newGroup);
+
+            const updatedGroup = await groupService.getById(groupId);
+
+            return res.status(200).json({ message: 'Group successfully updated', group: updatedGroup });
         } catch (error) {
-            res.status(500).json({ message: error });
             logger.error(`${req.method} - ${req.url} - ${JSON.stringify(req.body)} - Error: ${error}`);
+            return res.status(500).json({ message: error });
         }
     }
 );
@@ -109,17 +109,17 @@ groupRouter.delete('/:id', async (req: Request, res: Response) => {
         const group = await groupService.getById(groupId);
 
         if (!group) {
-            res.status(404).json({
+            return res.status(404).json({
                 message: `Group with id ${groupId} not found`
             });
-        } else {
-            await groupService.deleteById(groupId);
-
-            res.status(200).json({ message: 'Group successfully deleted', group });
         }
+
+        await groupService.deleteById(groupId);
+
+        return res.status(200).json({ message: 'Group successfully deleted', group });
     } catch (error) {
-        res.status(500).json({ message: error });
         logger.error(`${req.method} - ${req.url} - Error: ${error}`);
+        return res.status(500).json({ message: error });
     }
 });
 
@@ -131,19 +131,20 @@ groupRouter.post('/:id/add-users', async (req: Request, res: Response) => {
         const group = await groupService.getById(groupId);
 
         if (!group) {
-            res.status(404).json({
+            return res.status(404).json({
                 message: `Group with id ${groupId} not found`
             });
-        } else {
-            const groupToAddTo = await groupService.addUsersToGroup(groupId, userIds);
-            res.status(200).json({
-                message: `Users added to group with id ${groupId}`,
-                group: groupToAddTo
-            });
         }
+
+        const groupToAddTo = await groupService.addUsersToGroup(groupId, userIds);
+
+        return res.status(200).json({
+            message: `Users added to group with id ${groupId}`,
+            group: groupToAddTo
+        });
     } catch (error) {
-        res.status(500).json({ message: error });
         logger.error(`${req.method} - ${req.url} - Error: ${error}`);
+        return res.status(500).json({ message: error });
     }
 });
 

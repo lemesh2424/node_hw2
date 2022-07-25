@@ -8,5 +8,6 @@ export default {
     databaseUser: process.env.DATABASE_USER,
     databasePassword: process.env.DATABASE_PASSWORD,
     databaseHost: process.env.DATABASE_HOST,
-    databasePort: +process.env.DATABASE_PORT
+    databasePort: +process.env.DATABASE_PORT,
+    tokenKey: process.env.TOKEN_KEY
 };
